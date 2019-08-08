@@ -11,7 +11,7 @@ composable.
 
 ## Structs
 
-![structs](https://gist.githubusercontent.com/tazjin/ad6d48bc2416335acc5da4a197eb9ddc/raw/d7b1fa0a511ae40f0831b369df4b97103441c7e5/z-structs.png)
+![structs](https://gist.githubusercontent.com/tazjin/ad6d48bc2416335acc5da4a197eb9ddc/raw/d7a7cff3639115538a5085561bedf11cb36d04e7/z-structs.png)
 
 ## Nested structs!
 
