@@ -4,17 +4,16 @@
 # All types (should) compose as expected.
 #
 # TODO:
-#  - error messages for type-checks of map/list elements are bad
 #  - enums?
 
-{ toPretty ? ((import <nixpkgs> {}).lib.generators.toPretty) }:
+{ toPretty ? ((import <nixpkgs> {}).lib.generators.toPretty {}) }:
 
 # Checks are simply functions of the type `a -> bool` which check
 # whether `a` conforms to the specification.
 with builtins; let
   # Internal utilities:
   typeError = type: val:
-  throw "Expected type '${type}', but value '${toPretty {} val}' is of type '${typeOf val}'";
+  throw "Expected type '${type}', but value '${toPretty val}' is of type '${typeOf val}'";
 
   typedef = name: check: {
     inherit name check;
@@ -80,9 +79,18 @@ in (typeSet [
 
   # Polymorphic types
   (poly "option" (t: v: (isNull v) || t.check v))
-  (poly "list" (t: v: isList v && (foldl' (s: e: s && (t.check e)) true v)))
+
+  (poly "list" (t: v: isList v && (foldl' (s: e: s && (
+    if t.check e then true
+    else throw "Expected list element of type '${t.name}', but '${toPretty e}' is of type '${typeOf e}'"
+  )) true v)))
+
   (poly "attrs" (t: v:
-    isAttrs v && (foldl' (s: e: s && (t.check e)) true (attrValues v))
+    isAttrs v && (foldl' (s: e: s && (
+      if t.check e then true
+      else throw "Expected attribute set element of type '${t.name}', but '${toPretty e}' is of type '${typeOf e}'"
+    )) true (attrValues v))
   ))
+
   (poly2 "either" (t1: t2: v: t1.check v || t2.check v))
 ]) // { inherit struct; }
