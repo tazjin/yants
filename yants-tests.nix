@@ -45,4 +45,10 @@ deepSeq rec {
     blue = throw "It should not be blue!";
     green = throw "It should not be green!";
   };
+
+  # Test curried function definitions
+  func = defun [ string int string ]
+  (name: age: "${name} is ${toString age} years old");
+
+  testFunc = func "Brynhjulf" 42;
 } "All tests passed!\n"

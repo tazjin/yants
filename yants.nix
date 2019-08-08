@@ -74,6 +74,19 @@ with builtins; let
        else actions."${__functor { inherit name check; } x}";
   };
 
+  mkFunc = sig: f: {
+    inherit sig;
+    __toString = self: foldl' (s: t: "${s} -> ${t.name}")
+                              "λ :: ${(head self.sig).name}" (tail self.sig);
+    __functor = _: f;
+  };
+  defun' = sig: func: if length sig > 2
+    then mkFunc sig (x: defun' (tail sig) (func ((head sig) x)))
+    else mkFunc sig (x: ((head (tail sig)) (func ((head sig) x))));
+
+  defun = sig: func: if length sig < 2
+    then (throw "Signature must at least have two types (a -> b)")
+    else defun' sig func;
 in (typeSet [
   # Primitive types
   (typedef "any" (_: true))
@@ -98,4 +111,4 @@ in (typeSet [
   )) true (attrValues v))))
 
   (poly2 "either" (t1: t2: v: t1.check v || t2.check v))
-]) // { inherit struct enum; }
+]) // { inherit struct enum defun; }
