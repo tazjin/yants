@@ -2,13 +2,10 @@
 # polymorphic types as well as the ability to define & check records.
 #
 # All types (should) compose as expected.
-#
-# TODO(tazjin): enums?
 
 { toPretty ? ((import <nixpkgs> {}).lib.generators.toPretty {}) }:
 
 with builtins; let
-  # Internal utilities:
   typeError = type: val:
   throw "Expected type '${type}', but value '${toPretty val}' is of type '${typeOf val}'";
 
@@ -49,18 +46,30 @@ with builtins; let
   struct' = name: def: {
     inherit name def;
     check = value:
-      let
-        fieldMatch = foldl' (checkField def value) true (attrNames def);
-        noExtras = checkExtraneous name def (attrNames value);
+      let fieldMatch = foldl' (checkField def value) true (attrNames def);
+          noExtras = checkExtraneous name def (attrNames value);
       in (isAttrs value && fieldMatch && noExtras);
 
-    __functor = self: value: if self.check value
-      then value
+    __functor = self: value: if self.check value then value
       else (throw "Expected '${self.name}'-struct, but ${toPretty value} is of type ${typeOf value}");
   };
 
   struct = arg: if isString arg then (struct' arg)
                 else (struct' "anonymous" arg);
+
+  enum = name: values: rec {
+    inherit name values;
+    check = (x: elem x values);
+    __functor = self: x: if self.check x then x
+    else (throw "'${x}' is not a member of enum '${self.name}'");
+    match = x: actions: let
+      actionKeys = map (__functor { inherit name check; }) (attrNames actions);
+      missing = foldl' (m: k: if (elem k actionKeys) then m else m ++ [ k ]) [] values;
+    in if (length missing) > 0
+       then throw "Missing match action for members: ${toPretty missing}"
+       else actions."${__functor { inherit name check; } x}";
+  };
+
 in (typeSet [
   # Primitive types
   (typedef "any" (_: true))
@@ -79,12 +88,10 @@ in (typeSet [
     else throw "Expected list element of type '${t.name}', but '${toPretty e}' is of type '${typeOf e}'"
   )) true v)))
 
-  (poly "attrs" (t: v:
-    isAttrs v && (foldl' (s: e: s && (
-      if t.check e then true
-      else throw "Expected attribute set element of type '${t.name}', but '${toPretty e}' is of type '${typeOf e}'"
-    )) true (attrValues v))
-  ))
+  (poly "attrs" (t: v: isAttrs v && (foldl' (s: e: s && (
+    if t.check e then true
+    else throw "Expected attribute set element of type '${t.name}', but '${toPretty e}' is of type '${typeOf e}'"
+  )) true (attrValues v))))
 
   (poly2 "either" (t1: t2: v: t1.check v || t2.check v))
-]) // { inherit struct; }
+]) // { inherit struct enum; }
