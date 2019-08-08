@@ -25,23 +25,18 @@ with builtins; let
     "${n}" = t1: t2: typedef "${n}<${t1.name},${t2.name}>" (c t1 t2);
   };
 
-  ofType = t: x: isAttrs x && x ? "type" && x.type == t;
-
   typeSet = foldl' (s: t: s // (if t ? "name" then { "${t.name}" = t; } else t)) {};
 
-  # Struct checks performed:
-  #
-  # 1. All existing fields match their types
-  # 2. No non-optional fields are missing.
-  # 3. No unexpected fields are in the struct.
+  # Struct implementation. Checks that all fields match their declared
+  # types, no optional fields are missing and no unexpected fields
+  # occur in the struct.
   #
   # Anonymous structs are supported (e.g. for nesting) by omitting the
   # name.
   checkField = def: value: current: field:
-  let
-    fieldVal = if hasAttr field value then value."${field}" else null;
-    type = def."${field}";
-    checked = type.check fieldVal;
+  let fieldVal = if hasAttr field value then value."${field}" else null;
+      type = def."${field}";
+      checked = type.check fieldVal;
   in if checked then (current && true)
      else (throw "Field ${field} is of type ${typeOf fieldVal}, but expected ${type.name}");
 
@@ -64,9 +59,8 @@ with builtins; let
       else (throw "Expected '${self.name}'-struct, but ${toPretty value} is of type ${typeOf value}");
   };
 
-  struct = arg:
-  if isString arg then (struct' arg)
-  else (struct' "anonymous" arg);
+  struct = arg: if isString arg then (struct' arg)
+                else (struct' "anonymous" arg);
 in (typeSet [
   # Primitive types
   (typedef "any" (_: true))
