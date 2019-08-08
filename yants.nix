@@ -3,13 +3,10 @@
 #
 # All types (should) compose as expected.
 #
-# TODO:
-#  - enums?
+# TODO(tazjin): enums?
 
 { toPretty ? ((import <nixpkgs> {}).lib.generators.toPretty {}) }:
 
-# Checks are simply functions of the type `a -> bool` which check
-# whether `a` conforms to the specification.
 with builtins; let
   # Internal utilities:
   typeError = type: val:
@@ -32,9 +29,8 @@ with builtins; let
 
   typeSet = foldl' (s: t: s // (if t ? "name" then { "${t.name}" = t; } else t)) {};
 
-  # Struct checker implementation
+  # Struct checks performed:
   #
-  # Checks performed:
   # 1. All existing fields match their types
   # 2. No non-optional fields are missing.
   # 3. No unexpected fields are in the struct.
