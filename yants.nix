@@ -1,3 +1,6 @@
+# Copyright 2019 Google LLC
+# SPDX-License-Identifier: Apache-2.0
+#
 # Provides a "type-system" for Nix that provides various primitive &
 # polymorphic types as well as the ability to define & check records.
 #
