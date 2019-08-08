@@ -35,7 +35,8 @@ with builtins; let
       type = def."${field}";
       checked = type.check fieldVal;
   in if checked then (current && true)
-     else (throw "Field ${field} is of type ${typeOf fieldVal}, but expected ${type.name}");
+     else if isNull fieldVal then (throw "Missing required ${type.name} field '${field}'")
+          else  (throw "Field ${field} is of type ${typeOf fieldVal}, but expected ${type.name}");
 
   checkExtraneous = name: def: present:
   if (length present) == 0 then true
