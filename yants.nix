@@ -78,8 +78,9 @@ in (typeSet [
   (typedef "bool" isBool)
   (typedef "float" isFloat)
   (typedef "string" isString)
-  (typedef "derivation" (ofType "derivation"))
-
+  (typedef "derivation" (x: isAttrs x && x ? "type" && x.type == "derivation"))
+  (typedef "function" (x: isFunction x || (isAttrs x && x ? "__functor"
+                                           && isFunction x.__functor)))
   # Polymorphic types
   (poly "option" (t: v: (isNull v) || t.check v))
 
