@@ -28,6 +28,8 @@ with builtins; let
     "${n}" = t1: t2: typedef "${n}<${t1.name},${t2.name}>" (c t1 t2);
   };
 
+  ofType = t: x: isAttrs x && x ? "type" && x.type == t;
+
   typeSet = foldl' (s: t: s // (if t ? "name" then { "${t.name}" = t; } else t)) {};
 
   # Struct checker implementation
@@ -76,6 +78,7 @@ in (typeSet [
   (typedef "bool" isBool)
   (typedef "float" isFloat)
   (typedef "string" isString)
+  (typedef "derivation" (ofType "derivation"))
 
   # Polymorphic types
   (poly "option" (t: v: (isNull v) || t.check v))
