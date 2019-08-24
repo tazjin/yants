@@ -74,6 +74,20 @@ with builtins; let
        else actions."${__functor { inherit name check; } x}";
   };
 
+  sum = name: values: let
+    isVariant = x:
+      let name = elemAt (attrNames x) 0;
+      in if hasAttr name values
+        then values."${name}".check x."${name}"
+        else false;
+    check = x: isAttrs x && length (attrNames x) == 1 && isVariant x;
+  in {
+    inherit name values check;
+    __functor = self: x: if self.check x
+      then x
+      else throw "'${toPretty x}' is not a valid variant of '${name}'";
+  };
+
   mkFunc = sig: f: {
     inherit sig;
     __toString = self: foldl' (s: t: "${s} -> ${t.name}")
@@ -111,4 +125,4 @@ in (typeSet [
   )) true (attrValues v))))
 
   (poly2 "either" (t1: t2: v: t1.check v || t2.check v))
-]) // { inherit struct enum defun; }
+]) // { inherit struct enum sum defun; }

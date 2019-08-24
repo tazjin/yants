@@ -46,6 +46,23 @@ deepSeq rec {
     green = throw "It should not be green!";
   };
 
+  # Test sum type definitions
+  creature = sum "creature" {
+    human = struct {
+      name = string;
+      age = option int;
+    };
+
+    pet = enum "pet" [ "dog" "lizard" "cat" ];
+  };
+
+  testSum = creature {
+    human = {
+      name = "Brynhjulf";
+      age = 42;
+    };
+  };
+
   # Test curried function definitions
   func = defun [ string int string ]
   (name: age: "${name} is ${toString age} years old");
