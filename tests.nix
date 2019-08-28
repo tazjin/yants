@@ -1,5 +1,5 @@
 with builtins;
-with (import ./yants.nix {});
+with (import ./default.nix {});
 
 # Note: Derivations are not included in the tests below as they cause
 # issues with deepSeq.
