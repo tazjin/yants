@@ -1,6 +1,8 @@
 yants
 =====
 
+[![Build Status](https://travis-ci.org/tazjin/yants.svg?branch=master)](https://travis-ci.org/tazjin/yants)
+
 This is a tiny type-checker for data in Nix, written in Nix.
 
 Features:
