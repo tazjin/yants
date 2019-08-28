@@ -63,6 +63,11 @@ deepSeq rec {
     };
   };
 
+  testSumMatch = creature.match testSum {
+    human = v: "It's a human named ${v.name}";
+    pet = v: throw "It's not supposed to be a pet!";
+  };
+
   # Test curried function definitions
   func = defun [ string int string ]
   (name: age: "${name} is ${toString age} years old");
