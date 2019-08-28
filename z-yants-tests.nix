@@ -1,5 +1,5 @@
-with (import ./yants.nix {});
 with builtins;
+with (import ./yants.nix {});
 
 # Note: Derivations are not included in the tests below as they cause
 # issues with deepSeq.
@@ -68,4 +68,18 @@ deepSeq rec {
   (name: age: "${name} is ${toString age} years old");
 
   testFunc = func "Brynhjulf" 42;
+
+  # Test that all types are types.
+  testTypes = map type [
+    any bool drv float int string
+
+    (attrs int)
+    (either int string)
+    (enum [ "foo" "bar" ])
+    (list string)
+    (option int)
+    (option (list string))
+    (struct { a = int; b = option string; })
+    (sum { a = int; b = option string; })
+  ];
 } "All tests passed!\n"
