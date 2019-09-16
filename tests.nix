@@ -12,6 +12,7 @@ deepSeq rec {
     (float 13.37)
     (string "Hello!")
     (function (x: x * 2))
+    (path /nix)
   ];
 
   # Test that polymorphic types work as intended
@@ -76,7 +77,7 @@ deepSeq rec {
 
   # Test that all types are types.
   testTypes = map type [
-    any bool drv float int string
+    any bool drv float int string path
 
     (attrs int)
     (either int string)
