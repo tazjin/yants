@@ -97,6 +97,7 @@ in lib.fix (self: {
   bool     = typedef "bool" isBool;
   float    = typedef "float" isFloat;
   string   = typedef "string" isString;
+  path     = typedef "path" (x: typeOf x == "path");
   drv      = typedef "derivation" (x: isAttrs x && x ? "type" && x.type == "derivation");
   function = typedef "function" (x: isFunction x || (isAttrs x && x ? "__functor"
                                                  && isFunction x.__functor));
