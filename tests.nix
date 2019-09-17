@@ -31,12 +31,15 @@ deepSeq rec {
       email = string;
       phone = option string;
     });
+
+    _ = bool;
   };
 
   testPerson = person {
     name = "Brynhjulf";
     age  = 42;
     contact.email = "brynhjulf@yants.nix";
+    otherInfo = true;
   };
 
   # Test enum definitions & matching
