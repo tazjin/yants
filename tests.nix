@@ -20,6 +20,7 @@ deepSeq rec {
     (option int null)
     (list string [ "foo" "bar" ])
     (either int float 42)
+    (intersect string any "foo")
   ];
 
   # Test that structures work as planned.
@@ -72,6 +73,22 @@ deepSeq rec {
     pet = v: throw "It's not supposed to be a pet!";
   };
 
+  # Intersection test
+  a = struct "A" {
+    x = bool;
+    _ = any;
+  };
+
+  b = struct "B" {
+    y = int;
+    _ = any;
+  };
+
+  intersectTest = (intersect a b) {
+    x = true;
+    y = 42;
+  };
+
   # Test curried function definitions
   func = defun [ string int string ]
   (name: age: "${name} is ${toString age} years old");
@@ -85,6 +102,7 @@ deepSeq rec {
     (attrs int)
     (eitherN [ int string bool ])
     (either int string)
+    (intersect string any)
     (enum [ "foo" "bar" ])
     (list string)
     (option int)
