@@ -129,6 +129,11 @@ in lib.fix (self: {
 
   either = t1: t2: self.eitherN [ t1 t2 ];
 
+  intersectN = tn: typedef "intersect<${concatStringsSep "," (map (x: x.name) tn)}>"
+    (x: (all (t: (self.type t).check x) tn));
+
+  intersect = t1: t2: self.intersectN [ t1 t2 ];
+
   list = t: typedef' rec {
     name = "list<${t.name}>";
 
