@@ -158,8 +158,6 @@ in lib.fix (self: {
   #
   # Anonymous structs are supported (e.g. for nesting) by omitting the
   # name.
-  #
-  # TODO: Support open records?
   struct =
     # Struct checking is more involved than the simpler types above.
     # To make the actual type definition more readable, several
@@ -175,23 +173,24 @@ in lib.fix (self: {
           else "field '${name}': ${def.toError value result}\n";
       };
 
-      # checkExtraneous determines whether a (closed) struct contains
-      # any fields that are not part of the definition.
-      checkExtraneous = def: has: acc:
-        if (length has) == 0 then acc
-        else if (hasAttr (head has) def)
-          then checkExtraneous def (tail has) acc
-          else checkExtraneous def (tail has) {
+      # checkExtraneous determines whether a open struct contains
+      # any fields that are not part of the definition. It checks
+      # that any extra fields are of the type the open struct accepts
+      checkExtraneous = def: has: value: openType: acc:
+      if (length has) == 0 then acc
+        else if (hasAttr (head has) def) || (self.type openType).check value.${head has}
+          then checkExtraneous def (tail has) value openType acc
+          else checkExtraneous def (tail has) value openType {
             ok = false;
             err = acc.err + "unexpected struct field '${head has}'\n";
           };
 
       # checkStruct combines all structure checks and creates one
       # typecheck result from them
-      checkStruct = def: value:
+      checkStruct = def: value: openType:
         let
           init = { ok = true; err = ""; };
-          extraneous = checkExtraneous def (attrNames value) init;
+          extraneous = checkExtraneous def (attrNames value) value openType init;
 
           checkedFields = map (n:
             let v = if hasAttr n value then value."${n}" else null;
@@ -209,10 +208,11 @@ in lib.fix (self: {
       struct' = name: def: typedef' {
         inherit name def;
         checkType = value: if isAttrs value
-          then (checkStruct (self.attrs self.type def) value)
+          then if hasAttr "_" def then (checkStruct (removeAttrs (self.attrs self.type def) [ "_" ]) value def._)
+          else (checkStruct (self.attrs self.type def) value self.none)
           else { ok = false; err = typeError name value; };
 
-          toError = _: result: "expected '${name}'-struct, but found:\n" + result.err;
+        toError = _: result: "expected '${name}'-struct, but found:\n" + result.err;
       };
     in arg: if isString arg then (struct' arg) else (struct' "anon" arg);
 
