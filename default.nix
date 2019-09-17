@@ -93,6 +93,7 @@ with builtins; let
 in lib.fix (self: {
   # Primitive types
   any      = typedef "any" (_: true);
+  none     = typedef "none" (_: false);
   int      = typedef "int" isInt;
   bool     = typedef "bool" isBool;
   float    = typedef "float" isFloat;
