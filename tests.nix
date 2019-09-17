@@ -77,7 +77,7 @@ deepSeq rec {
 
   # Test that all types are types.
   testTypes = map type [
-    any bool drv float int string path
+    any none bool drv float int string path
 
     (attrs int)
     (eitherN [ int string bool ])
