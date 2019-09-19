@@ -80,6 +80,7 @@ deepSeq rec {
     any bool drv float int string path
 
     (attrs int)
+    (eitherN [ int string bool ])
     (either int string)
     (enum [ "foo" "bar" ])
     (list string)
