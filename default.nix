@@ -123,10 +123,24 @@ in lib.fix (self: {
       };
   };
 
-  eitherN = tn: typedef "either<${concatStringsSep ", " (map (x: x.name) tn)}>"
+  eitherN =
+  let
+    plain = tn: typedef "either<${concatStringsSep ", " (map (x: x.name) tn)}>"
     (x: any (t: (self.type t).check x) tn);
+    eitherN' = tn: lib.fix (e: (plain tn) // {
+      match = x: actions:
+        if (length actions) != (length tn)
+          then throw "${length actions} actions given for ${length tn}-ary either"
+          else
+          let
+            findAction = t: a: if (head t).check x then head a x else findAction (tail t) (tail a);
+          in findAction tn actions;
+    });
+  in eitherN';
 
-  either = t1: t2: self.eitherN [ t1 t2 ];
+  either = t1: t2: let
+    e = self.eitherN [ t1 t2 ];
+  in e // { match = x: action1: action2: e.match x [ action1 action2 ]; };
 
   list = t: typedef' rec {
     name = "list<${t.name}>";
