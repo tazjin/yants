@@ -69,6 +69,8 @@ deepSeq rec {
     pet = v: throw "It's not supposed to be a pet!";
   };
 
+  eitherMatch = (either int bool).match true (x: throw "Should not be int!") (x: "Is bool ${toString x}");
+
   # Test curried function definitions
   func = defun [ string int string ]
   (name: age: "${name} is ${toString age} years old");
