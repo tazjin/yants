@@ -123,8 +123,10 @@ in lib.fix (self: {
       };
   };
 
-  either = t1: t2: typedef "either<${t1.name},${t2.name}>"
-    (x: (self.type t1).check x || (self.type t2).check x);
+  eitherN = tn: typedef "either<${concatStringsSep ", " (map (x: x.name) tn)}>"
+    (x: any (t: (self.type t).check x) tn);
+
+  either = t1: t2: self.eitherN [ t1 t2 ];
 
   list = t: typedef' rec {
     name = "list<${t.name}>";
