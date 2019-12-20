@@ -1,86 +1,12 @@
-yants
-=====
+**YANTS** is Yet Another Nix Type System.
 
-[![Build Status](https://travis-ci.org/tazjin/yants.svg?branch=master)](https://travis-ci.org/tazjin/yants)
+Its code **has moved** to `//depot/nix/yants` on [git.tazj.in][]. At this point
+most of my software (unless it lives in other organisations) is no longer
+developed on GitHub.
 
-This is a tiny type-checker for data in Nix, written in Nix.
+If you are looking for an issue tracker, issues and patches for my projects are
+tracked at [depot@tazj.in][] (which is also the email address that you can send
+issues and patches to).
 
-# Features
-
-* Checking of primitive types (`int`, `string` etc.)
-* Checking polymorphic types (`option`, `list`, `either`)
-* Defining & checking struct/record types
-* Defining & matching enum types
-* Defining & matching sum types
-* Defining function signatures (including curried functions)
-* Types are composable! `option string`! `list (either int (option float))`!
-* Type errors also compose!
-
-Currently lacking:
-
-* Any kind of inference
-* Convenient syntax for attribute-set function signatures
-
-## Primitives & simple polymorphism
-
-![simple](screenshots/simple.png)
-
-## Structs
-
-![structs](screenshots/structs.png)
-
-## Nested structs!
-
-![nested structs](screenshots/nested-structs.png)
-
-## Enums!
-
-![enums](screenshots/enums.png)
-
-## Functions!
-
-![functions](screenshots/functions.png)
-
-# Usage
-
-Yants can be imported from its `default.nix`. A single attribute (`lib`) can be
-passed, which will otherwise be imported from `<nixpkgs>`.
-
-Examples for the most common import methods would be:
-
-1. Import into scope with `with`:
-    ```nix
-    with (import ./default.nix {});
-    # ... Nix code that uses yants ...
-    ```
-
-2. Import as a named variable:
-    ```nix
-    let yants = import ./default.nix {};
-    in yants.string "foo" # or other uses ...
-    ````
-
-3. Overlay into `pkgs.lib`:
-    ```nix
-    # wherever you import your package set (e.g. from <nixpkgs>):
-    import <nixpkgs> {
-      overlays = [
-        (self: super: {
-          lib = super.lib // { yants = import ./default.nix { inherit (super) lib; }; };
-        })
-      ];
-    }
-
-    # yants now lives at lib.yants, besides the other library functions!
-    ```
-
-Please see my [Nix one-pager](https://github.com/tazjin/nix-1p) for more generic
-information about the Nix language and what the above constructs mean.
-
-# Stability
-
-The current API of Yants is **not yet** considered stable, but it works fine and
-should continue to do so even if used at an older version.
-
-Yants' tests use Nix versions above 2.2 - compatibility with older versions is
-not guaranteed.
+[git.tazj.in]: https://git.tazj.in/tree/nix/yants
+[depot@tazj.in]: https://groups.google.com/a/tazj.in/forum/?hl=en#!forum/depot
